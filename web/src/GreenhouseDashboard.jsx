@@ -107,7 +107,6 @@ const RANGES = [
   { key: 24, label: "24h" },
   { key: 168, label: "7d" },
   { key: 720, label: "30d" },
-  { key: 2160, label: "3mo" },
 ];
 
 const ACTUATORS = [
@@ -445,7 +444,7 @@ function Login({ onLogin }) {
         </button>
 
         <p style={{ color: C.faint, fontSize: 11, marginTop: 18, textAlign: "center", lineHeight: 1.6 }} className="gh-mono">
-          Demo login · admin / greenhouse2026
+          Group C Assignment
         </p>
       </div>
     </div>
