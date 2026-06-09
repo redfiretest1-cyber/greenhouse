@@ -196,7 +196,7 @@ function Dashboard({ onThresholdsClick, onLogout, device, setDevice }) {
               </h1>
             </div>
             <p style={{ color: C.dim, margin: "8px 0 0", fontSize: 14 }}>
-              Live telemetry from Azure Cosmos DB · IoT &amp; Cloud Technology
+              IoT &amp; Cloud Technology Assignment
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
@@ -378,7 +378,7 @@ function Dashboard({ onThresholdsClick, onLogout, device, setDevice }) {
         </div>
 
         <p style={{ textAlign: "center", color: C.faint, fontSize: 12, marginTop: 26 }} className="gh-mono">
-          IoT &amp; Cloud Technology · Smart Greenhouse · Azure Cosmos DB
+          IoT &amp; Cloud Technology · Group Assignment · Group C 
         </p>
       </div>
     </div>
