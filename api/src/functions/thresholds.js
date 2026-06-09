@@ -70,10 +70,16 @@ app.http("thresholds", {
       const deviceId = request.query.get("deviceId") || "GreenHouseID";
       const noCache = { "Content-Type": "application/json", "Cache-Control": "no-store" };
       try {
-        const { resource } = await container
-          .item(`thresholds-${deviceId}`, deviceId)
-          .read();
-        return { status: 200, headers: noCache, jsonBody: resource || { deviceId, ...DEFAULTS } };
+        // Query (cross-partition) so it works no matter what the container's
+        // partition key is — a point-read assumes /deviceId and can miss the doc.
+        const { resources } = await container.items
+          .query({
+            query: "SELECT * FROM c WHERE c.docType = 'thresholds' AND c.deviceId = @d",
+            parameters: [{ name: "@d", value: deviceId }],
+          })
+          .fetchAll();
+        const doc = resources[0];
+        return { status: 200, headers: noCache, jsonBody: doc || { deviceId, ...DEFAULTS } };
       } catch {
         // No saved thresholds yet -> hand back the defaults.
         return { status: 200, headers: noCache, jsonBody: { deviceId, ...DEFAULTS } };
