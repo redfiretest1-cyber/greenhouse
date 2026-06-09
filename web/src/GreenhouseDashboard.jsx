@@ -105,8 +105,9 @@ const METRICS = {
 const RANGES = [
   { key: 6, label: "6h" },
   { key: 24, label: "24h" },
-  { key: 72, label: "3d" },
   { key: 168, label: "7d" },
+  { key: 720, label: "30d" },
+  { key: 2160, label: "3mo" },
 ];
 
 const ACTUATORS = [
