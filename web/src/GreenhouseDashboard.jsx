@@ -39,7 +39,7 @@ const C = {
    SAMPLE DATA  (matches your Cosmos document schema exactly)
    Replace generateData() with a real fetch() to your /api/readings
 -----------------------------------------------------------------*/
-const DEVICES = ["GreenHouseID", "GreenHouse-A", "GreenHouse-B"];
+const DEVICES = ["GreenHouseID"];
 
 function seeded(i, salt) {
   const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
