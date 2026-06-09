@@ -8,31 +8,10 @@ const container = client
   .container(process.env.COSMOS_CONTAINER || "Readings");
 
 app.http("readings", {
-  methods: ["GET", "POST"],
+  methods: ["GET"],
   authLevel: "anonymous",
   handler: async (request, context) => {
     try {
-      // ---- POST: insert a new reading document into Cosmos ----
-      if (request.method === "POST") {
-        const body = await request.json();
-        const doc = {
-          id: (globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`),
-          deviceId: body.deviceId || "GreenHouseID",
-          temperature: Number(body.temperature),
-          humidity: Number(body.humidity),
-          soilPercent: Number(body.soilPercent),
-          co2Ppm: Number(body.co2Ppm),
-          lightPercent: Number(body.lightPercent),
-          growLightOn: !!body.growLightOn,
-          ventRelayOn: !!body.ventRelayOn,
-          co2RelayOn: !!body.co2RelayOn,
-          pumpRelayOn: !!body.pumpRelayOn,
-          eventTime: body.eventTime || new Date().toISOString(),
-        };
-        const { resource } = await container.items.create(doc);
-        return { status: 201, jsonBody: resource };
-      }
-
       // ---- GET: read filters from the query string ----
       const deviceId = request.query.get("deviceId"); // e.g. GreenHouseID
       const hours = parseInt(request.query.get("hours") || "24", 10);

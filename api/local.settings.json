@@ -3,9 +3,11 @@
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "AzureWebJobsStorage": "",
-    "COSMOS_CONNECTION_STRING": "AccountEndpoint=https://greenhouse-iot-db.documents.azure.com:443/;AccountKey=t6RZ6DhGGoaSHV5NDLuepXQW4vfsKlmGr4jhwhp1o4yOGsTOsNi6BFNDOUm9sglbfItbs9zLmujfACDbw7F4Bw====;",
-    "COSMOS_DATABASE": "GreenhouseDB",
-    "COSMOS_CONTAINER": "Readings"
+    "COSMOS_CONNECTION_STRING": "AccountEndpoint=https://YOUR-ACCOUNT.documents.azure.com:443/;AccountKey=YOUR-KEY==;",
+    "COSMOS_DATABASE": "greenhouse-iot",
+    "COSMOS_CONTAINER": "greenhouse-iot-container",
+    "COSMOS_THRESHOLD_DATABASE": "GreenhouseConfig",
+    "COSMOS_THRESHOLD_CONTAINER": "Thresholds"
   },
   "Host": {
     "CORS": "*"

@@ -51,8 +51,10 @@ runs the whole thing exactly like production.
 5. Create. Azure adds a GitHub Action that builds and deploys on every push.
 6. In the Static Web App -> **Configuration**, add application settings:
    - `COSMOS_CONNECTION_STRING`
-   - `COSMOS_DATABASE` = GreenhouseDB
-   - `COSMOS_CONTAINER` = Readings
+   - `COSMOS_DATABASE` = greenhouse-iot
+   - `COSMOS_CONTAINER` = greenhouse-iot-container
+   - `COSMOS_THRESHOLD_DATABASE` = GreenhouseConfig   (separate config DB)
+   - `COSMOS_THRESHOLD_CONTAINER` = Thresholds
 7. Open the generated `*.azurestaticapps.net` URL — done. The dashboard calls
    `/api/readings` on the same domain, so there are no CORS issues.
 
