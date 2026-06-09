@@ -68,14 +68,15 @@ app.http("thresholds", {
 
       // ---- GET: return thresholds for a device (or defaults) ----
       const deviceId = request.query.get("deviceId") || "GreenHouseID";
+      const noCache = { "Content-Type": "application/json", "Cache-Control": "no-store" };
       try {
         const { resource } = await container
           .item(`thresholds-${deviceId}`, deviceId)
           .read();
-        return { status: 200, jsonBody: resource || { deviceId, ...DEFAULTS } };
+        return { status: 200, headers: noCache, jsonBody: resource || { deviceId, ...DEFAULTS } };
       } catch {
         // No saved thresholds yet -> hand back the defaults.
-        return { status: 200, jsonBody: { deviceId, ...DEFAULTS } };
+        return { status: 200, headers: noCache, jsonBody: { deviceId, ...DEFAULTS } };
       }
     } catch (err) {
       context.error("Threshold operation failed:", err);

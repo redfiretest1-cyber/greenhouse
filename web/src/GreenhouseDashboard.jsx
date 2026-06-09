@@ -478,7 +478,8 @@ function ThresholdsModal({ device, onClose }) {
   // load current thresholds for this device from the config DB
   useEffect(() => {
     let cancelled = false;
-    fetch(`/api/thresholds?deviceId=${encodeURIComponent(device)}`)
+    // cache:"no-store" + timestamp param so we never get a stale cached copy
+    fetch(`/api/thresholds?deviceId=${encodeURIComponent(device)}&_=${Date.now()}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((doc) => {
         if (cancelled) return;
@@ -571,11 +572,23 @@ function ThresholdsModal({ device, onClose }) {
    APP  — login gate + dashboard + thresholds modal
 ================================================================= */
 export default function App() {
-  const [authed, setAuthed] = useState(false);
+  // Persist login across page refreshes (cleared when the tab is closed).
+  const [authed, setAuthed] = useState(
+    () => sessionStorage.getItem("gh_authed") === "1"
+  );
   const [showThresholds, setShowThresholds] = useState(false);
   const [device, setDevice] = useState(DEVICES[0]);
 
-  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
+  const handleLogin = () => {
+    sessionStorage.setItem("gh_authed", "1");
+    setAuthed(true);
+  };
+  const handleLogout = () => {
+    sessionStorage.removeItem("gh_authed");
+    setAuthed(false);
+  };
+
+  if (!authed) return <Login onLogin={handleLogin} />;
 
   return (
     <>
@@ -583,7 +596,7 @@ export default function App() {
         device={device}
         setDevice={setDevice}
         onThresholdsClick={() => setShowThresholds(true)}
-        onLogout={() => setAuthed(false)}
+        onLogout={handleLogout}
       />
       {showThresholds && (
         <ThresholdsModal device={device} onClose={() => setShowThresholds(false)} />
