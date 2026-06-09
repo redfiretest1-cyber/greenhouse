@@ -6,7 +6,14 @@ import {
 import {
   Thermometer, Droplets, Sprout, Wind, Sun, Lightbulb,
   Fan, CloudFog, Waves, Activity, ChevronDown, Circle,
+  Plus, LogOut, X, Lock, Loader2,
 } from "lucide-react";
+
+/* ----------------------------------------------------------------
+   DEMO LOGIN CREDENTIALS  (client-side only — not real security)
+-----------------------------------------------------------------*/
+const DEMO_USER = "admin";
+const DEMO_PASS = "greenhouse2026";
 
 /* ----------------------------------------------------------------
    THEME
@@ -112,8 +119,7 @@ const ACTUATORS = [
 /* ----------------------------------------------------------------
    COMPONENT
 -----------------------------------------------------------------*/
-export default function GreenhouseDashboard() {
-  const [device, setDevice] = useState(DEVICES[0]);
+function Dashboard({ reloadKey, onAddClick, onLogout, device, setDevice }) {
   const [hours, setHours] = useState(24);
   const [metric, setMetric] = useState("temperature");
   const [devOpen, setDevOpen] = useState(false);
@@ -134,7 +140,7 @@ export default function GreenhouseDashboard() {
         if (!cancelled) setData(generateData(device, hours));
       });
     return () => { cancelled = true; };
-  }, [device, hours]);
+  }, [device, hours, reloadKey]);
 
   const latest = data[data.length - 1];
   if (!latest) return <div style={{ color: "#8aa394", padding: 40, fontFamily: "monospace" }}>Loading…</div>;
@@ -192,9 +198,21 @@ export default function GreenhouseDashboard() {
               Live telemetry from Azure Cosmos DB · IoT &amp; Cloud Technology
             </p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: C.dim }}>
-            <Circle className="gh-live" size={9} fill={C.green} color={C.green} />
-            <span className="gh-mono">Last update {new Date(latest.eventTime).toLocaleTimeString()}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: C.dim }}>
+              <Circle className="gh-live" size={9} fill={C.green} color={C.green} />
+              <span className="gh-mono">{new Date(latest.eventTime).toLocaleTimeString()}</span>
+            </div>
+            <button className="gh-btn" onClick={onAddClick}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 16px", borderRadius: 11, border: "none",
+                background: `linear-gradient(135deg, ${C.green}, ${C.lime})`, color: C.bg, fontSize: 14, fontWeight: 600, fontFamily: "inherit" }}>
+              <Plus size={17} /> Add reading
+            </button>
+            <button className="gh-btn" onClick={onLogout} title="Log out"
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 14px", borderRadius: 11,
+                background: C.panel2, color: C.dim, border: `1px solid ${C.line}`, fontSize: 14, fontFamily: "inherit" }}>
+              <LogOut size={16} />
+            </button>
           </div>
         </header>
 
@@ -359,9 +377,211 @@ export default function GreenhouseDashboard() {
         </div>
 
         <p style={{ textAlign: "center", color: C.faint, fontSize: 12, marginTop: 26 }} className="gh-mono">
-          Sample data shown · swap generateData() for fetch('/api/readings') to use live Cosmos DB
+          IoT &amp; Cloud Technology · Smart Greenhouse · Azure Cosmos DB
         </p>
       </div>
     </div>
+  );
+}
+
+/* ================================================================
+   LOGIN SCREEN  (hardcoded credentials — demo only)
+================================================================= */
+function Login({ onLogin }) {
+  const [user, setUser] = useState("");
+  const [pass, setPass] = useState("");
+  const [error, setError] = useState("");
+
+  const submit = () => {
+    if (user === DEMO_USER && pass === DEMO_PASS) {
+      setError("");
+      onLogin();
+    } else {
+      setError("Invalid username or password");
+    }
+  };
+
+  const field = {
+    width: "100%", boxSizing: "border-box", padding: "12px 14px", marginTop: 6,
+    background: C.panel2, border: `1px solid ${C.line}`, borderRadius: 10,
+    color: C.text, fontSize: 15, fontFamily: "'IBM Plex Mono', monospace", outline: "none",
+  };
+
+  return (
+    <div style={{ background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, fontFamily: "'Archivo', system-ui, sans-serif" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');`}</style>
+      <div style={{ width: "100%", maxWidth: 380, background: C.panel, border: `1px solid ${C.line}`, borderRadius: 20, padding: 34 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 6 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 11, background: `linear-gradient(135deg, ${C.green}, ${C.lime})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Sprout size={22} color={C.bg} />
+          </div>
+          <h1 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 23, margin: 0, color: C.text, fontWeight: 800 }}>
+            Smart Greenhouse
+          </h1>
+        </div>
+        <p style={{ color: C.dim, fontSize: 13, margin: "0 0 26px" }}>Sign in to view the dashboard</p>
+
+        <label style={{ fontSize: 12, color: C.faint, letterSpacing: 0.5 }}>USERNAME</label>
+        <input style={field} value={user} autoFocus
+          onChange={(e) => setUser(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()} />
+
+        <div style={{ height: 16 }} />
+        <label style={{ fontSize: 12, color: C.faint, letterSpacing: 0.5 }}>PASSWORD</label>
+        <input style={field} type="password" value={pass}
+          onChange={(e) => setPass(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()} />
+
+        {error && (
+          <div style={{ color: "#ff7a7a", fontSize: 13, marginTop: 14 }}>{error}</div>
+        )}
+
+        <button className="gh-btn" onClick={submit}
+          style={{ width: "100%", marginTop: 24, padding: "13px", borderRadius: 11, border: "none",
+            background: `linear-gradient(135deg, ${C.green}, ${C.lime})`, color: C.bg, fontSize: 15, fontWeight: 700,
+            fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, cursor: "pointer" }}>
+          <Lock size={16} /> Sign in
+        </button>
+
+        <p style={{ color: C.faint, fontSize: 11, marginTop: 18, textAlign: "center", lineHeight: 1.6 }} className="gh-mono">
+          Demo login · admin / greenhouse2026
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   ADD READING  — sets default values and writes a new doc to Cosmos
+================================================================= */
+const DEFAULTS = {
+  temperature: 25.0, humidity: 70, soilPercent: 50,
+  co2Ppm: 800, lightPercent: 50,
+  growLightOn: false, ventRelayOn: false, co2RelayOn: false, pumpRelayOn: false,
+};
+
+function AddReadingModal({ device, onClose, onAdded }) {
+  const [form, setForm] = useState({ ...DEFAULTS });
+  const [status, setStatus] = useState("idle"); // idle | saving | error
+  const [msg, setMsg] = useState("");
+
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const numFields = [
+    ["temperature", "Temperature", "°C"],
+    ["humidity", "Humidity", "%"],
+    ["soilPercent", "Soil Moisture", "%"],
+    ["co2Ppm", "CO₂", "ppm"],
+    ["lightPercent", "Light", "%"],
+  ];
+
+  const save = async () => {
+    setStatus("saving");
+    setMsg("");
+    try {
+      const res = await fetch("/api/readings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deviceId: device,
+          ...form,
+          eventTime: new Date().toISOString(),
+        }),
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      onAdded();
+      onClose();
+    } catch (e) {
+      setStatus("error");
+      setMsg(e.message + " — is the Cosmos connection string set?");
+    }
+  };
+
+  const field = {
+    width: "100%", boxSizing: "border-box", padding: "10px 12px", marginTop: 5,
+    background: C.panel2, border: `1px solid ${C.line}`, borderRadius: 9,
+    color: C.text, fontSize: 14, fontFamily: "'IBM Plex Mono', monospace", outline: "none",
+  };
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 100 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, maxHeight: "88vh", overflowY: "auto", background: C.panel, border: `1px solid ${C.line}`, borderRadius: 18, padding: 26 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+          <h2 style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 20, margin: 0, color: C.text, fontWeight: 700 }}>Add reading</h2>
+          <button className="gh-btn" onClick={onClose} style={{ background: "none", border: "none", color: C.dim, cursor: "pointer" }}><X size={20} /></button>
+        </div>
+        <p style={{ color: C.dim, fontSize: 13, margin: "0 0 20px" }} className="gh-mono">Inserts a document into Cosmos for {device}</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          {numFields.map(([key, label, unit]) => (
+            <div key={key}>
+              <label style={{ fontSize: 12, color: C.faint }}>{label} ({unit})</label>
+              <input style={field} type="number" value={form[key]}
+                onChange={(e) => set(key, e.target.value === "" ? "" : Number(e.target.value))} />
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          {ACTUATORS.map((a) => (
+            <button key={a.key} className="gh-btn" onClick={() => set(a.key, !form[a.key])}
+              style={{ display: "flex", alignItems: "center", gap: 9, padding: "11px 13px", borderRadius: 10,
+                background: form[a.key] ? "rgba(126,231,135,.12)" : C.panel2,
+                border: `1px solid ${form[a.key] ? C.green : C.line}`, color: form[a.key] ? C.green : C.dim,
+                fontSize: 13, fontFamily: "inherit", cursor: "pointer" }}>
+              <a.icon size={16} /> {a.label}: {form[a.key] ? "ON" : "OFF"}
+            </button>
+          ))}
+        </div>
+
+        {status === "error" && (
+          <div style={{ color: "#ff7a7a", fontSize: 13, marginTop: 16 }}>{msg}</div>
+        )}
+
+        <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+          <button className="gh-btn" onClick={onClose}
+            style={{ flex: 1, padding: 12, borderRadius: 11, background: C.panel2, color: C.dim, border: `1px solid ${C.line}`, fontSize: 14, fontFamily: "inherit", cursor: "pointer" }}>
+            Cancel
+          </button>
+          <button className="gh-btn" onClick={save} disabled={status === "saving"}
+            style={{ flex: 2, padding: 12, borderRadius: 11, border: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              background: `linear-gradient(135deg, ${C.green}, ${C.lime})`, color: C.bg, fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer" }}>
+            {status === "saving" ? <Loader2 size={16} className="gh-live" /> : <Plus size={16} />}
+            {status === "saving" ? "Saving…" : "Save to Cosmos DB"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   APP  — login gate + dashboard + add-reading modal
+================================================================= */
+export default function App() {
+  const [authed, setAuthed] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [device, setDevice] = useState(DEVICES[0]);
+
+  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
+
+  return (
+    <>
+      <Dashboard
+        reloadKey={reloadKey}
+        device={device}
+        setDevice={setDevice}
+        onAddClick={() => setShowAdd(true)}
+        onLogout={() => setAuthed(false)}
+      />
+      {showAdd && (
+        <AddReadingModal
+          device={device}
+          onClose={() => setShowAdd(false)}
+          onAdded={() => setReloadKey((k) => k + 1)}
+        />
+      )}
+    </>
   );
 }
